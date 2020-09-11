@@ -87,6 +87,8 @@ void floydWarshall(int **graph, int ***D, int ***P, int n) {
             D[0][i][j] = graph[i][j];
             if (i != j && D[0][i][j] < INF) {
                 P[0][i][j] = i;
+            } else {
+                P[0][i][j] = -1;
             }
         }
     }
@@ -106,6 +108,22 @@ void floydWarshall(int **graph, int ***D, int ***P, int n) {
     }
 }
 
+int getPath(int **P, int i, int j, string& output) {
+    if (i == j) {
+        output.append(to_string(i+1));
+        output.append(" ");
+        return 1;
+    } else if (P[i][j] == -1) {
+        cout << "Error" << endl;
+        return 0;
+    } else {
+        int res = getPath(P, i, P[i][j], output);
+        output.append(to_string(j+1));
+        output.append(" ");
+        return res + 1;
+    }
+}
+
 void calculateDiameter(int **graph, int ***D, int ***P, int n) {
     floydWarshall(graph, D, P, n);
     // Get diameter
@@ -119,9 +137,12 @@ void calculateDiameter(int **graph, int ***D, int ***P, int n) {
             }
         }
     }
-    cout << "diameter " << diameter << endl;
+    string path("");
+    int numv = getPath(P[n-1], u, v, path);
+    cout << diameter << endl;
     cout << u+1 << " " << v+1 << endl;
-    // TODO: Print path
+    cout << numv << endl;
+    cout << path << endl;
 }
 
 int main(int argc, char const *argv[])
