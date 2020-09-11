@@ -6,17 +6,6 @@ using namespace std;
 #define MAX_V 300
 #define INF 99999999
 
-int **create2dArray(int n, int m) {
-    int **A = new int*[n];
-    for (int i=0; i<n; i++) {
-        A[i] = new int[m];
-        for (int j=0; j<m; j++) {
-            A[i][j] = 0;
-        }
-    }
-    return A;
-}
-
 int ***create3dArray(int d, int n, int m) {
     int ***A = new int**[d];
     for (int i=0; i<d; i++) {
@@ -31,13 +20,6 @@ int ***create3dArray(int d, int n, int m) {
     return A;
 }
 
-void deallocate2dArray(int **A, int n, int m) {
-    for (int i=0; i<n; i++) {
-        delete[] A[i];
-    }
-    delete[] A;
-}
-
 void deallocate3dArray(int ***A, int d, int n, int m) {
     for (int i=0; i<d; i++) {
         for (int j=0; j<n; j++) {
@@ -46,15 +28,6 @@ void deallocate3dArray(int ***A, int d, int n, int m) {
         delete[] A[i];
     }
     delete[] A;
-}
-
-void printGraph(int **graph, int n) {
-    for (int i=0; i<n; i++) {
-        for (int j=0; j<n; j++) {
-            cout << graph[i][j] << " ";
-        }
-        cout << endl;
-    }
 }
 
 int readGraph(int **graph) {
@@ -80,11 +53,10 @@ int readGraph(int **graph) {
     return n;
 }
 
-void floydWarshall(int **graph, int ***D, int ***P, int n) {
-    // Initialize D(0) and P[0]
+void floydWarshall(int ***D, int ***P, int n) {
+    // Initialize P(0)
     for (int i=0; i<n; i++) {
         for (int j=0; j<n; j++) {
-            D[0][i][j] = graph[i][j];
             if (i != j && D[0][i][j] < INF) {
                 P[0][i][j] = i;
             } else {
@@ -124,8 +96,8 @@ int getPath(int **P, int i, int j, string& output) {
     }
 }
 
-void calculateDiameter(int **graph, int ***D, int ***P, int n) {
-    floydWarshall(graph, D, P, n);
+void calculateDiameter(int ***D, int ***P, int n) {
+    floydWarshall(D, P, n);
     // Get diameter
     int diameter=0, u, v;
     for (int i=0; i<n; i++) {
@@ -147,13 +119,11 @@ void calculateDiameter(int **graph, int ***D, int ***P, int n) {
 
 int main(int argc, char const *argv[])
 {
-    int **graph = create2dArray(MAX_V, MAX_V); // Graph weights matrix
     int ***D = create3dArray(MAX_V+1, MAX_V+1, MAX_V+1); // D matrices
     int ***P = create3dArray(MAX_V+1, MAX_V+1, MAX_V+1); // Pi matrices
-    int n = readGraph(graph);
-    calculateDiameter(graph, D, P, n);
+    int n = readGraph(D[0]);
+    calculateDiameter(D, P, n);
 
-    deallocate2dArray(graph, MAX_V, MAX_V);
     deallocate3dArray(D, MAX_V+1, MAX_V+1, MAX_V+1);
     deallocate3dArray(P, MAX_V+1, MAX_V+1, MAX_V+1);
     return 0;
