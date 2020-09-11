@@ -1,6 +1,6 @@
 #include <iostream>
 #include <limits>
-#include <string>
+#include <vector>
 using namespace std;
 
 #define MAX_V 300
@@ -80,18 +80,16 @@ void floydWarshall(int ***D, int ***P, int n) {
     }
 }
 
-int getPath(int **P, int i, int j, string& output) {
+int getPath(int **P, int i, int j, vector <int>& path) {
     if (i == j) {
-        output.append(to_string(i+1));
-        output.append(" ");
+        path.push_back(i);
         return 1;
     } else if (P[i][j] == -1) {
         cout << "Error" << endl;
         return 0;
     } else {
-        int res = getPath(P, i, P[i][j], output);
-        output.append(to_string(j+1));
-        output.append(" ");
+        int res = getPath(P, i, P[i][j], path);
+        path.push_back(j);
         return res + 1;
     }
 }
@@ -109,12 +107,15 @@ void calculateDiameter(int ***D, int ***P, int n) {
             }
         }
     }
-    string path("");
+    vector <int> path;
     int numv = getPath(P[n-1], u, v, path);
     cout << diameter << endl;
     cout << u+1 << " " << v+1 << endl;
     cout << numv << endl;
-    cout << path << endl;
+    for (int i = 0; i<path.size()-1; i++) {
+        cout << path[i]+1 << " ";
+    }
+    cout << path[path.size()-1]+1 << endl;
 }
 
 int main(int argc, char const *argv[])
