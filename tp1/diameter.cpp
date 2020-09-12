@@ -101,14 +101,14 @@ void calculateDiameter(int ***D, int ***P, int n) {
     for (int i=0; i<n; i++) {
         for (int j=0; j<n; j++) {
             if (D[n][i][j] < INF && D[n][i][j] > diameter) {
-                diameter = D[n-1][i][j];
+                diameter = D[n][i][j];
                 u = i;
                 v = j;
             }
         }
     }
     vector <int> path;
-    int numv = getPath(P[n-1], u, v, path);
+    int numv = getPath(P[n], u, v, path);
     cout << diameter << endl;
     cout << u+1 << " " << v+1 << endl;
     cout << numv << endl;
