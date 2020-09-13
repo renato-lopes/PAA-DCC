@@ -30,18 +30,15 @@ void deallocate3dArray(int ***A, int d, int n, int m) {
     delete[] A;
 }
 
-int readGraph(int **graph) {
+void readEdges(int **graph, int n, int m) {
     // Initialize graph with no edges
-    for (int i=0; i<MAX_V; i++) {
-        for (int j=0; j<MAX_V; j++) {
+    for (int i=0; i<n; i++) {
+        for (int j=0; j<n; j++) {
             if (i != j) {
                 graph[i][j] = INF;
             }
         }
     }
-    int n, m;
-    cin >> n;
-    cin >> m;
     for (int i=0; i<m; i++) {
         int u, v, w;
         cin >> u;
@@ -50,7 +47,6 @@ int readGraph(int **graph) {
         graph[u-1][v-1] = w;
         graph[v-1][u-1] = w;
     }
-    return n;
 }
 
 void floydWarshall(int ***D, int ***P, int n) {
@@ -80,24 +76,22 @@ void floydWarshall(int ***D, int ***P, int n) {
     }
 }
 
-int getPath(int **P, int i, int j, vector <int>& path) {
+void getPath(int **P, int i, int j, vector <int>& path) {
     if (i == j) {
         path.push_back(i);
-        return 1;
     } else if (P[i][j] == -1) {
         cout << "Error" << endl;
-        return 0;
     } else {
-        int res = getPath(P, i, P[i][j], path);
+        getPath(P, i, P[i][j], path);
         path.push_back(j);
-        return res + 1;
     }
 }
 
 void calculateDiameter(int ***D, int ***P, int n) {
+    // Run Floyd-Warshall to get all-pairs shortest distance
     floydWarshall(D, P, n);
-    // Get diameter
-    int diameter=0, u, v;
+    // Get diameter (max min distance)
+    int diameter=-1, u, v;
     for (int i=0; i<n; i++) {
         for (int j=0; j<n; j++) {
             if (D[n][i][j] < INF && D[n][i][j] > diameter) {
@@ -107,11 +101,13 @@ void calculateDiameter(int ***D, int ***P, int n) {
             }
         }
     }
+    // Get path between u and v
     vector <int> path;
-    int numv = getPath(P[n], u, v, path);
+    getPath(P[n], u, v, path);
+    // Print output
     cout << diameter << endl;
     cout << u+1 << " " << v+1 << endl;
-    cout << numv << endl;
+    cout << int(path.size()) << endl;
     for (int i = 0; i<path.size()-1; i++) {
         cout << path[i]+1 << " ";
     }
@@ -120,13 +116,20 @@ void calculateDiameter(int ***D, int ***P, int n) {
 
 int main(int argc, char const *argv[])
 {
-    int ***D = create3dArray(MAX_V+1, MAX_V+1, MAX_V+1); // D matrices
-    int ***P = create3dArray(MAX_V+1, MAX_V+1, MAX_V+1); // Pi matrices
-    int n = readGraph(D[0]);
+    // Read amount of vertices n and of edges m
+    int n, m;
+    cin >> n;
+    cin >> m;
+    // Allocate memory for matrices
+    int ***D = create3dArray(n+1, n, n); // D matrices
+    int ***P = create3dArray(n+1, n, n); // Pi matrices
+    // Read graph edges
+    readEdges(D[0], n, m);
+    // Calculate diameter
     calculateDiameter(D, P, n);
-
-    deallocate3dArray(D, MAX_V+1, MAX_V+1, MAX_V+1);
-    deallocate3dArray(P, MAX_V+1, MAX_V+1, MAX_V+1);
+    // Free memory
+    deallocate3dArray(D, n+1, n, n);
+    deallocate3dArray(P, n+1, n, n);
     return 0;
 }
 
